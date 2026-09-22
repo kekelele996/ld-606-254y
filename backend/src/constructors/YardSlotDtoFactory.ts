@@ -1,1 +1,14 @@
-export const createYardSlotDto = (overrides = {}) => ({ id: 1, yard_area: "yard area 1", row_no: "row no 1", bay_no: "bay no 1", tier_no: "tier no 1", container_no: "container no 1", slot_status: "CONFLICT", cargo_type: "CONFLICT", ...overrides });
+import type { YardSlot } from "../models/YardSlot";
+
+export const createYardSlotDto = (overrides: Partial<YardSlot> = {}): YardSlot => ({
+  id: 1,
+  yard_area: "A区",
+  row_no: "01",
+  bay_no: "01",
+  tier_no: "00",
+  container_no: "",
+  slot_status: "EMPTY",
+  cargo_type: "GENERAL",
+  reserved_by_plan_id: null,
+  ...overrides
+});

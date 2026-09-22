@@ -1,3 +1,8 @@
-export const BerthPlanStatus = ["DRAFT","CONFLICT","APPROVED","BERTHING","DEPARTED","CANCELLED"] as const;
-export type BerthPlanStatus = (typeof BerthPlanStatus)[number];
-export const BerthPlanStatusText: Record<BerthPlanStatus, string> = Object.fromEntries(BerthPlanStatus.map((value) => [value, value.replace(/_/g, " ")])) as Record<BerthPlanStatus, string>;
+export {
+  BerthPlanStatus,
+  BerthPlanStatusText,
+  BerthPlanStatusLabel,
+  BerthPlanStatusTone
+} from "../constants/BerthPlanStatus";
+import type { BerthPlanStatus } from "../constants/BerthPlanStatus";
+export type { BerthPlanStatus };

@@ -1,63 +1,68 @@
 CREATE TABLE IF NOT EXISTS vessel (
-  id INTEGER PRIMARY KEY,
-  vessel_name TEXT,
-  imo_no TEXT,
-  carrier TEXT,
-  length_m TEXT,
-  draft_m TEXT,
-  eta TEXT,
-  etd TEXT,
-  status TEXT
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  vessel_name VARCHAR(128),
+  imo_no VARCHAR(32),
+  carrier VARCHAR(128),
+  length_m VARCHAR(16),
+  draft_m VARCHAR(16),
+  eta VARCHAR(32),
+  etd VARCHAR(32),
+  status VARCHAR(32)
 );
 
 CREATE TABLE IF NOT EXISTS berth (
-  id INTEGER PRIMARY KEY,
-  berth_code TEXT,
-  length_m TEXT,
-  water_depth_m TEXT,
-  berth_type TEXT,
-  current_status TEXT,
-  safety_note TEXT
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  berth_code VARCHAR(32),
+  length_m VARCHAR(16),
+  water_depth_m VARCHAR(16),
+  berth_type VARCHAR(32),
+  current_status VARCHAR(32),
+  safety_note VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS berth_plan (
-  id INTEGER PRIMARY KEY,
-  vessel_id TEXT,
-  berth_id TEXT,
-  planned_arrival TEXT,
-  planned_departure TEXT,
-  priority TEXT,
-  status TEXT,
-  dispatcher_id TEXT
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  vessel_id INT,
+  berth_id INT,
+  planned_arrival VARCHAR(32),
+  planned_departure VARCHAR(32),
+  priority VARCHAR(16),
+  status VARCHAR(32),
+  dispatcher_id INT,
+  conflict_reason TEXT,
+  conflict_plan_ids VARCHAR(255),
+  yard_slot_id INT,
+  approved_at VARCHAR(32)
 );
 
 CREATE TABLE IF NOT EXISTS yard_slot (
-  id INTEGER PRIMARY KEY,
-  yard_area TEXT,
-  row_no TEXT,
-  bay_no TEXT,
-  tier_no TEXT,
-  container_no TEXT,
-  slot_status TEXT,
-  cargo_type TEXT
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  yard_area VARCHAR(32),
+  row_no VARCHAR(8),
+  bay_no VARCHAR(8),
+  tier_no VARCHAR(8),
+  container_no VARCHAR(32),
+  slot_status VARCHAR(16),
+  cargo_type VARCHAR(32),
+  reserved_by_plan_id INT
 );
 
 CREATE TABLE IF NOT EXISTS work_task (
-  id INTEGER PRIMARY KEY,
-  berth_plan_id TEXT,
-  yard_slot_id TEXT,
-  task_type TEXT,
-  team_id TEXT,
-  status TEXT,
-  planned_start TEXT,
-  finished_at TEXT
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  berth_plan_id INT,
+  yard_slot_id INT,
+  task_type VARCHAR(32),
+  team_id INT,
+  status VARCHAR(32),
+  planned_start VARCHAR(32),
+  finished_at VARCHAR(32)
 );
 
 CREATE TABLE IF NOT EXISTS audit_log (
-  id INTEGER PRIMARY KEY,
-  actor TEXT,
-  action TEXT,
-  target_type TEXT,
-  target_id TEXT,
-  created_at TEXT
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  actor VARCHAR(64),
+  action VARCHAR(64),
+  target_type VARCHAR(32),
+  target_id VARCHAR(32),
+  created_at VARCHAR(32)
 );

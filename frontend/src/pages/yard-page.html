@@ -1,0 +1,44 @@
+<section class="page-grid">
+  <div class="panel wide">
+    <div class="panel-head">
+      <h2>堆场箱位占用</h2>
+      <button class="link" (click)="refresh()">刷新占用结果</button>
+    </div>
+    <div class="metrics">
+      <div class="stat"><span>总箱位</span><strong>{{ matrix.total }}</strong></div>
+      <div class="stat"><span>空箱位</span><strong>{{ matrix.empty }}</strong></div>
+      <div class="stat"><span>已预留（审批联动）</span><strong>{{ matrix.reserved }}</strong></div>
+      <div class="stat"><span>已占用</span><strong>{{ matrix.occupied }}</strong></div>
+      <div class="stat"><span>已锁定</span><strong>{{ matrix.locked }}</strong></div>
+      <div class="stat"><span>占用率</span><strong>{{ matrix.occupancyRate }}%</strong></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>筛选 / 搜索</h2>
+    <input placeholder="搜索箱号、位置或计划 #" [(ngModel)]="keyword" (ngModelChange)="keyword.set($event)" name="keyword" />
+    <div class="filters">
+      <button [class.active]="statusFilter() === 'ALL'" (click)="statusFilter.set('ALL')">全部</button>
+      <button [class.active]="statusFilter() === 'EMPTY'" (click)="statusFilter.set('EMPTY')">空箱位</button>
+      <button [class.active]="statusFilter() === 'RESERVED'" (click)="statusFilter.set('RESERVED')">已预留</button>
+      <button [class.active]="statusFilter() === 'OCCUPIED'" (click)="statusFilter.set('OCCUPIED')">已占用</button>
+      <button [class.active]="statusFilter() === 'LOCKED'" (click)="statusFilter.set('LOCKED')">已锁定</button>
+    </div>
+  </div>
+
+  <div class="panel wide">
+    <h2>箱位矩阵</h2>
+    <app-yard-grid [slots]="filteredSlots()"></app-yard-grid>
+    <p class="hint" *ngIf="filteredSlots().length === 0">没有匹配的箱位。</p>
+  </div>
+
+  <div class="panel">
+    <h2>预留结果（靠泊审批联动）</h2>
+    <p class="hint" *ngIf="reservedSlots().length === 0">暂无已预留箱位。</p>
+    <div class="reserve-row" *ngFor="let item of reservedSlots()">
+      <app-status-badge kind="slot" [value]="item.slot.slot_status"></app-status-badge>
+      <span>箱位 #{{ item.slot.id }}（{{ item.slot.row_no }}-{{ item.slot.bay_no }}-{{ item.slot.tier_no }}）</span>
+      <span class="muted" *ngIf="item.plan">计划 #{{ item.plan.id }} · 泊位 #{{ item.plan.berth_id }}</span>
+    </div>
+  </div>
+</section>

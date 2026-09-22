@@ -1,0 +1,106 @@
+<section class="page-grid">
+  <div class="panel wide">
+    <div class="panel-head">
+      <h2>泊位时间轴</h2>
+      <span class="hint">红色斜纹条为时间冲突计划，点击条目标题查看/审批</span>
+    </div>
+    <app-berth-timeline [plans]="plans()" [berths]="berths()" (select)="canApprove($event) ? openApprove($event) : null"></app-berth-timeline>
+  </div>
+
+  <div class="panel">
+    <h2>提交靠泊计划</h2>
+    <form class="form" (ngSubmit)="onSubmit()">
+      <label>船舶
+        <select [(ngModel)]="form.vessel_id" name="vessel_id" required>
+          <option [ngValue]="0" disabled>请选择船舶</option>
+          <option *ngFor="let v of vessels()" [ngValue]="v.id">{{ v.vessel_name }}（{{ v.length_m }}m / 吃水 {{ v.draft_m }}m）</option>
+        </select>
+      </label>
+      <label>泊位
+        <select [(ngModel)]="form.berth_id" name="berth_id" required>
+          <option [ngValue]="0" disabled>请选择泊位</option>
+          <option *ngFor="let b of berths()" [ngValue]="b.id">{{ b.berth_code }}（限长 {{ b.length_m }}m / 水深 {{ b.water_depth_m }}m）</option>
+        </select>
+      </label>
+      <label>计划到港
+        <input type="datetime-local" [(ngModel)]="form.planned_arrival" name="planned_arrival" required />
+      </label>
+      <label>计划离港
+        <input type="datetime-local" [(ngModel)]="form.planned_departure" name="planned_departure" required />
+      </label>
+      <label>优先级
+        <select [(ngModel)]="form.priority" name="priority">
+          <option>LOW</option>
+          <option>NORMAL</option>
+          <option>HIGH</option>
+        </select>
+      </label>
+      <button class="primary" type="submit" [disabled]="submitting">{{ submitting ? "提交中…" : "提交计划" }}</button>
+    </form>
+    <p class="msg" *ngIf="submitMessage" [class.danger]="submitConflictIds.length > 0">{{ submitMessage }}</p>
+    <div class="conflict-refs" *ngIf="submitConflictIds.length > 0">
+      冲突计划：
+      <strong *ngFor="let id of submitConflictIds">#{{ id }} </strong>
+    </div>
+  </div>
+
+  <div class="panel wide">
+    <div class="panel-head">
+      <h2>靠泊计划（{{ plans().length }}）</h2>
+      <span class="danger-text">冲突 {{ conflictView.totalConflict }} 条</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>#</th><th>船舶</th><th>泊位</th><th>在港时间</th><th>优先级</th><th>状态</th><th>冲突原因</th><th>预留箱位</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of plans()">
+            <td>{{ p.id }}</td>
+            <td>{{ vesselName(p.vessel_id) }}</td>
+            <td>{{ berthCode(p.berth_id) }}</td>
+            <td class="time">{{ formatDate(p.planned_arrival) }}<br />~ {{ formatDate(p.planned_departure) }}</td>
+            <td>{{ p.priority }}</td>
+            <td><app-status-badge kind="plan" [value]="p.status"></app-status-badge></td>
+            <td class="reason">
+              <app-conflict-badge *ngIf="p.status === 'CONFLICT'" [reason]="reasonOf(p)" [count]="p.conflict_plan_ids.length"></app-conflict-badge>
+              <span class="reason-text" *ngIf="p.conflict_reason" [title]="p.conflict_reason">{{ p.conflict_reason }}</span>
+            </td>
+            <td>
+              <span *ngIf="p.yard_slot_id !== null">箱位 #{{ p.yard_slot_id }}</span>
+              <span class="muted" *ngIf="p.yard_slot_id === null">—</span>
+            </td>
+            <td>
+              <button class="link" *ngIf="canApprove(p)" (click)="openApprove(p)">审批</button>
+              <span class="muted" *ngIf="!canApprove(p)">已处理</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="modal" *ngIf="approvingPlan">
+  <div class="modal-card">
+    <div class="panel-head">
+      <h2>审批计划 #{{ approvingPlan.id }} · 指定空箱位</h2>
+      <button class="link" (click)="closeApprove()">关闭</button>
+    </div>
+    <p class="hint">
+      {{ vesselName(approvingPlan.vessel_id) }} 靠泊 {{ berthCode(approvingPlan.berth_id) }}，
+      {{ formatDate(approvingPlan.planned_arrival) }} ~ {{ formatDate(approvingPlan.planned_departure) }}。
+      船舶长度/吃水不符泊位限制、箱位已非空或计划已被处理时将整次拒绝，计划与箱位均不变化。
+    </p>
+    <p *ngIf="approvingPlan.conflict_reason" class="msg danger">{{ approvingPlan.conflict_reason }}（仍可审批，调度确认后将同时预留箱位）</p>
+    <p class="hint">请点选一个 <strong>空箱位</strong>（已预留/占用/锁定不可选）：</p>
+    <app-yard-grid [slots]="slots()" [selectable]="true" (pick)="pickSlot($event)"></app-yard-grid>
+    <p class="msg" *ngIf="chosenSlotId !== null">已选择箱位 #{{ chosenSlotId }}，当前为空，确认后预留。</p>
+    <p class="msg danger" *ngIf="approveError">{{ approveError }}</p>
+    <div class="modal-actions">
+      <button class="primary" [disabled]="approving || chosenSlotId === null" (click)="onApprove()">
+        {{ approving ? "审批中…" : "确认审批并预留箱位" }}
+      </button>
+    </div>
+  </div>
+</div>
