@@ -1,21 +1,14 @@
 import { mockData } from "../mocks/seedData";
+import { request } from "./http";
 import type { Berth } from "../types/Berth";
 
 const endpoint = "/api/berth";
 
 export async function listBerth(): Promise<Berth[]> {
-  if (typeof fetch !== "undefined" && endpoint.startsWith("/api") && true) {
-    try {
-      const res = await fetch(endpoint);
-      if (res.ok) return await res.json();
-    } catch {
-      // Local mock fallback keeps the UI available during offline review.
-    }
+  try {
+    return await request<Berth[]>(endpoint);
+  } catch (error) {
+    console.warn("listBerth fallback to mock", error);
+    return [...(mockData.berth as unknown as Berth[])];
   }
-  return [...(mockData.berth as unknown as Berth[])];
-}
-
-export async function saveBerth(payload: Berth) {
-  console.info("save Berth", payload);
-  return payload;
 }

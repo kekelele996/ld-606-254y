@@ -14,6 +14,25 @@ cp .env.example .env && docker compose up -d
 
 后端健康检查：<http://localhost:21106/health>
 
+### 靠泊计划审批与箱位联动（核心业务流）
+
+- 提交计划 `POST /api/berth-plan`：与**同一泊位已批准（APPROVED）**计划的在港时间窗重叠时，记录照常保留并标记为 `CONFLICT`，响应 `{ plan, has_conflict, conflicts[] }` 返回全部冲突计划及原因。
+- 冲突原因 `GET /api/berth-plan/:id/conflicts`：泊位页对每个 `CONFLICT` 计划展示。
+- 审批计划 `POST /api/berth-plan/:id/approve`，请求体必须指定空箱位 `{ "yard_slot_id": 21 }`。以下任一不满足则**整次拒绝**（计划与箱位都不变化）：
+  - 船舶总长超过泊位长度（`BERTH_LENGTH_EXCEEDED`）或吃水超过泊位水深（`BERTH_DRAFT_EXCEEDED`）；
+  - 箱位已不是 `EMPTY`（`SLOT_NOT_EMPTY`）；
+  - 计划已被处理（`PLAN_ALREADY_PROCESSED`，仅 `DRAFT/CONFLICT` 可审批）；
+  - 未指定箱位（`SLOT_REQUIRED`）。
+- 审批通过后计划置 `APPROVED` 与箱位置 `RESERVED` 在同一把锁内同时生效；重复或并发审批只有一个请求成功。
+- 写操作受 RBAC 控制（请求头 `x-role: dispatcher|admin` 可审批，其余角色返回 `RBAC_DENIED`），并写入审计日志（`BerthPlan.approve`、`YardSlot.reserve`）。
+- 泊位页（`/berths`）可提交、查看冲突原因并审批；堆场页（`/yard`）展示箱位占用结果与占用来源计划。
+
+```bash
+curl -X POST http://localhost:21106/api/berth-plan/2/approve \
+  -H 'Content-Type: application/json' -H 'x-role: dispatcher' \
+  -d '{"yard_slot_id":21}'
+```
+
 
 ## 本地开发方式
 
@@ -57,6 +76,10 @@ backend/src/routes, controllers, services, models, repositories, middlewares, co
 - BerthPlanStatus: constants/BerthPlanStatus、types/BerthPlanStatus、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
 - YardSlotStatus: constants/YardSlotStatus、types/YardSlotStatus、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
 - WorkTaskType: constants/WorkTaskType、types/WorkTaskType、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
+
+### “审批 + 箱位联动”改动触达面
+
+修改审批/冲突规则至少需要同步：后端 `models/BerthPlan`（reserved_slot_id）、`seed.ts`、`repositories/*`、`services/BerthPlanService`、`controllers/BerthPlanController`、`routes/BerthPlanRoutes`、`middlewares/rbacMiddleware`、`constants/errorCodes|errorMessages|logTemplates`、`constructors/BerthPlanDtoFactory`、`utils/conflict|ServiceError`；前端 `types/BerthPlan|YardSlot`、`api/BerthPlan|http`、`stores/BerthPlanStore|YardSlotStore`、`hooks/useBerthConflict|useYardMatrix`、`components/common/{ConflictBadge,StatusBadge,BerthTimeline,YardGrid}`、`pages/{BerthsPage,YardPage}`、`constants/errorMessages|BerthPlanStatus|YardSlotStatus` 与 `database/init.sql`。
 
 ## 为什么会牵一发动全身
 

@@ -1,162 +1,40 @@
+/**
+ * 本地种子数据（离线回退），结构与后端 /api 返回保持一致。
+ * 仅在后端不可达时使用，禁止接入第三方 API。
+ */
 export const mockData = {
-  "vessel": [
-    {
-      "id": 1,
-      "vessel_name": "vessel name 1",
-      "imo_no": "imo no 1",
-      "carrier": "carrier 1",
-      "length_m": "length m 1",
-      "draft_m": "draft m 1",
-      "eta": "eta 1",
-      "etd": "etd 1",
-      "status": "CONFLICT"
-    },
-    {
-      "id": 2,
-      "vessel_name": "vessel name 2",
-      "imo_no": "imo no 2",
-      "carrier": "carrier 2",
-      "length_m": "length m 2",
-      "draft_m": "draft m 2",
-      "eta": "eta 2",
-      "etd": "etd 2",
-      "status": "APPROVED"
-    },
-    {
-      "id": 3,
-      "vessel_name": "vessel name 3",
-      "imo_no": "imo no 3",
-      "carrier": "carrier 3",
-      "length_m": "length m 3",
-      "draft_m": "draft m 3",
-      "eta": "eta 3",
-      "etd": "etd 3",
-      "status": "DRAFT"
-    }
+  vessel: [
+    { id: 1, vessel_name: "远洋先锋", imo_no: "IMO-9472816", carrier: "中远海运", length_m: 220, draft_m: 11.5, eta: "2026-09-22T06:00:00.000Z", etd: "2026-09-22T20:00:00.000Z", status: "EXPECTED" },
+    { id: 2, vessel_name: "南海明珠", imo_no: "IMO-9288719", carrier: "招商轮船", length_m: 180, draft_m: 9.2, eta: "2026-09-23T02:00:00.000Z", etd: "2026-09-23T16:00:00.000Z", status: "EXPECTED" },
+    { id: 3, vessel_name: "东方海湾", imo_no: "IMO-9655271", carrier: "海丰国际", length_m: 260, draft_m: 13.8, eta: "2026-09-24T00:00:00.000Z", etd: "2026-09-24T18:00:00.000Z", status: "EXPECTED" },
+    { id: 4, vessel_name: "华海快航", imo_no: "IMO-9119994", carrier: "中谷物流", length_m: 150, draft_m: 7.6, eta: "2026-09-22T10:00:00.000Z", etd: "2026-09-23T02:00:00.000Z", status: "EXPECTED" }
   ],
-  "berth": [
-    {
-      "id": 1,
-      "berth_code": "berth code 1",
-      "length_m": "length m 1",
-      "water_depth_m": "water depth m 1",
-      "berth_type": "CONFLICT",
-      "current_status": "CONFLICT",
-      "safety_note": "safety note 1"
-    },
-    {
-      "id": 2,
-      "berth_code": "berth code 2",
-      "length_m": "length m 2",
-      "water_depth_m": "water depth m 2",
-      "berth_type": "APPROVED",
-      "current_status": "APPROVED",
-      "safety_note": "safety note 2"
-    },
-    {
-      "id": 3,
-      "berth_code": "berth code 3",
-      "length_m": "length m 3",
-      "water_depth_m": "water depth m 3",
-      "berth_type": "BERTHING",
-      "current_status": "DRAFT",
-      "safety_note": "safety note 3"
-    }
+  berth: [
+    { id: 1, berth_code: "B-01", length_m: 300, water_depth_m: 15, berth_type: "CONTAINER", current_status: "AVAILABLE", safety_note: "主航道侧，注意强风流" },
+    { id: 2, berth_code: "B-02", length_m: 200, water_depth_m: 10, berth_type: "CONTAINER", current_status: "AVAILABLE", safety_note: "夜间限制作业" },
+    { id: 3, berth_code: "B-03", length_m: 180, water_depth_m: 9, berth_type: "BULK", current_status: "AVAILABLE", safety_note: "散货泊位，龙门吊检修中" }
   ],
-  "berthPlan": [
-    {
-      "id": 1,
-      "vessel_id": 1,
-      "berth_id": 1,
-      "planned_arrival": "planned arrival 1",
-      "planned_departure": "planned departure 1",
-      "priority": "priority 1",
-      "status": "CONFLICT",
-      "dispatcher_id": 1
-    },
-    {
-      "id": 2,
-      "vessel_id": 2,
-      "berth_id": 2,
-      "planned_arrival": "planned arrival 2",
-      "planned_departure": "planned departure 2",
-      "priority": "priority 2",
-      "status": "APPROVED",
-      "dispatcher_id": 2
-    },
-    {
-      "id": 3,
-      "vessel_id": 3,
-      "berth_id": 3,
-      "planned_arrival": "planned arrival 3",
-      "planned_departure": "planned departure 3",
-      "priority": "priority 3",
-      "status": "DRAFT",
-      "dispatcher_id": 3
-    }
+  berthPlan: [
+    { id: 1, vessel_id: 1, berth_id: 1, planned_arrival: "2026-09-22T08:00:00.000Z", planned_departure: "2026-09-22T18:00:00.000Z", priority: "HIGH", status: "APPROVED", dispatcher_id: 1, reserved_slot_id: 11, vessel_name: "远洋先锋", berth_code: "B-01", reserved_slot_code: "A-R1-B1-T1" },
+    { id: 2, vessel_id: 2, berth_id: 2, planned_arrival: "2026-09-23T04:00:00.000Z", planned_departure: "2026-09-23T14:00:00.000Z", priority: "NORMAL", status: "DRAFT", dispatcher_id: 1, reserved_slot_id: null, vessel_name: "南海明珠", berth_code: "B-02", reserved_slot_code: null },
+    { id: 3, vessel_id: 3, berth_id: 2, planned_arrival: "2026-09-23T08:00:00.000Z", planned_departure: "2026-09-23T20:00:00.000Z", priority: "NORMAL", status: "CONFLICT", dispatcher_id: 1, reserved_slot_id: null, vessel_name: "东方海湾", berth_code: "B-02", reserved_slot_code: null },
+    { id: 4, vessel_id: 4, berth_id: 3, planned_arrival: "2026-09-22T12:00:00.000Z", planned_departure: "2026-09-23T00:00:00.000Z", priority: "LOW", status: "DRAFT", dispatcher_id: 1, reserved_slot_id: null, vessel_name: "华海快航", berth_code: "B-03", reserved_slot_code: null }
   ],
-  "yardSlot": [
-    {
-      "id": 1,
-      "yard_area": "yard area 1",
-      "row_no": "row no 1",
-      "bay_no": "bay no 1",
-      "tier_no": "tier no 1",
-      "container_no": "container no 1",
-      "slot_status": "CONFLICT",
-      "cargo_type": "CONFLICT"
-    },
-    {
-      "id": 2,
-      "yard_area": "yard area 2",
-      "row_no": "row no 2",
-      "bay_no": "bay no 2",
-      "tier_no": "tier no 2",
-      "container_no": "container no 2",
-      "slot_status": "APPROVED",
-      "cargo_type": "APPROVED"
-    },
-    {
-      "id": 3,
-      "yard_area": "yard area 3",
-      "row_no": "row no 3",
-      "bay_no": "bay no 3",
-      "tier_no": "tier no 3",
-      "container_no": "container no 3",
-      "slot_status": "DRAFT",
-      "cargo_type": "BERTHING"
-    }
+  yardSlot: [
+    { id: 11, yard_area: "A", row_no: "R1", bay_no: "B1", tier_no: "T1", container_no: "", slot_status: "RESERVED", cargo_type: "EMPTY", reserved_by_plan: 1, slot_code: "A-R1-B1-T1", occupied_by_plan: 1 },
+    { id: 12, yard_area: "A", row_no: "R1", bay_no: "B1", tier_no: "T2", container_no: "", slot_status: "EMPTY", cargo_type: "EMPTY", reserved_by_plan: null, slot_code: "A-R1-B1-T2", occupied_by_plan: null },
+    { id: 13, yard_area: "A", row_no: "R1", bay_no: "B2", tier_no: "T1", container_no: "CBHU8821104", slot_status: "OCCUPIED", cargo_type: "FULL", reserved_by_plan: null, slot_code: "A-R1-B2-T1", occupied_by_plan: null },
+    { id: 14, yard_area: "A", row_no: "R2", bay_no: "B1", tier_no: "T1", container_no: "", slot_status: "EMPTY", cargo_type: "EMPTY", reserved_by_plan: null, slot_code: "A-R2-B1-T1", occupied_by_plan: null },
+    { id: 15, yard_area: "A", row_no: "R2", bay_no: "B2", tier_no: "T1", container_no: "", slot_status: "EMPTY", cargo_type: "EMPTY", reserved_by_plan: null, slot_code: "A-R2-B2-T1", occupied_by_plan: null },
+    { id: 16, yard_area: "A", row_no: "R2", bay_no: "B3", tier_no: "T1", container_no: "MSCU7712039", slot_status: "LOCKED", cargo_type: "FULL", reserved_by_plan: null, slot_code: "A-R2-B3-T1", occupied_by_plan: null },
+    { id: 21, yard_area: "B", row_no: "R1", bay_no: "B1", tier_no: "T1", container_no: "", slot_status: "EMPTY", cargo_type: "EMPTY", reserved_by_plan: null, slot_code: "B-R1-B1-T1", occupied_by_plan: null },
+    { id: 22, yard_area: "B", row_no: "R1", bay_no: "B1", tier_no: "T2", container_no: "", slot_status: "EMPTY", cargo_type: "EMPTY", reserved_by_plan: null, slot_code: "B-R1-B1-T2", occupied_by_plan: null },
+    { id: 23, yard_area: "B", row_no: "R1", bay_no: "B2", tier_no: "T1", container_no: "", slot_status: "EMPTY", cargo_type: "EMPTY", reserved_by_plan: null, slot_code: "B-R1-B2-T1", occupied_by_plan: null },
+    { id: 24, yard_area: "B", row_no: "R2", bay_no: "B1", tier_no: "T1", container_no: "TCLU5520918", slot_status: "OCCUPIED", cargo_type: "FULL", reserved_by_plan: null, slot_code: "B-R2-B1-T1", occupied_by_plan: null },
+    { id: 25, yard_area: "B", row_no: "R2", bay_no: "B2", tier_no: "T1", container_no: "", slot_status: "EMPTY", cargo_type: "EMPTY", reserved_by_plan: null, slot_code: "B-R2-B2-T1", occupied_by_plan: null },
+    { id: 26, yard_area: "B", row_no: "R2", bay_no: "B3", tier_no: "T1", container_no: "", slot_status: "EMPTY", cargo_type: "EMPTY", reserved_by_plan: null, slot_code: "B-R2-B3-T1", occupied_by_plan: null }
   ],
-  "workTask": [
-    {
-      "id": 1,
-      "berth_plan_id": 1,
-      "yard_slot_id": 1,
-      "task_type": "CONFLICT",
-      "team_id": 1,
-      "status": "CONFLICT",
-      "planned_start": "planned start 1",
-      "finished_at": "2026-06-11T09:00:00Z"
-    },
-    {
-      "id": 2,
-      "berth_plan_id": 2,
-      "yard_slot_id": 2,
-      "task_type": "APPROVED",
-      "team_id": 2,
-      "status": "APPROVED",
-      "planned_start": "planned start 2",
-      "finished_at": "2026-06-12T09:00:00Z"
-    },
-    {
-      "id": 3,
-      "berth_plan_id": 3,
-      "yard_slot_id": 3,
-      "task_type": "BERTHING",
-      "team_id": 3,
-      "status": "DRAFT",
-      "planned_start": "planned start 3",
-      "finished_at": "2026-06-13T09:00:00Z"
-    }
+  workTask: [
+    { id: 1, berth_plan_id: 1, yard_slot_id: 11, task_type: "DISCHARGE", team_id: 1, status: "PLANNED", planned_start: "2026-09-22T09:00:00.000Z", finished_at: "" }
   ]
 } as const;

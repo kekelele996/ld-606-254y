@@ -1,1 +1,12 @@
-export const createBerthDto = (overrides = {}) => ({ id: 1, berth_code: "berth code 1", length_m: "length m 1", water_depth_m: "water depth m 1", berth_type: "CONFLICT", current_status: "CONFLICT", safety_note: "safety note 1", ...overrides });
+import type { Berth } from "../models/Berth";
+
+export const createBerthDto = (overrides: Partial<Berth> = {}): Berth => ({
+  id: 1,
+  berth_code: "B-01",
+  length_m: 300,
+  water_depth_m: 15,
+  berth_type: "CONTAINER",
+  current_status: "AVAILABLE",
+  safety_note: "",
+  ...overrides
+});

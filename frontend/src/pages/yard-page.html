@@ -1,0 +1,56 @@
+<div class="page">
+  <section class="page-head">
+    <div>
+      <p class="eyebrow">yard occupancy</p>
+      <h1>堆场箱位占用</h1>
+      <p class="hint">靠泊计划审批通过后，所选箱位联动置为“已预留”，这里实时展示占用结果。</p>
+    </div>
+    <button class="btn" (click)="refresh()">刷新数据</button>
+  </section>
+
+  <section class="metrics">
+    <div class="stat"><span>总箱位</span><strong>{{ slotStore.slots().length }}</strong></div>
+    <div class="stat"><span>空闲</span><strong>{{ slotStore.emptyCount() }}</strong></div>
+    <div class="stat"><span>已预留（审批联动）</span><strong>{{ slotStore.reservedCount() }}</strong></div>
+    <div class="stat"><span>已占用</span><strong>{{ slotStore.occupiedCount() }}</strong></div>
+    <div class="stat"><span>锁定</span><strong>{{ slotStore.lockedCount() }}</strong></div>
+    <div class="stat"><span>占用率</span><strong>{{ occupancy() }}%</strong></div>
+  </section>
+
+  <section class="panel">
+    <div class="toolbar">
+      <h2>箱位矩阵</h2>
+      <input class="search" type="search" placeholder="搜索箱位编码 / 箱号 / 计划号" [(ngModel)]="keyword" />
+    </div>
+    <app-yard-grid [slots]="filteredSlots()" />
+    <p class="hint" *ngIf="filteredSlots().length === 0">没有匹配的箱位。</p>
+  </section>
+
+  <section class="panel">
+    <h2>占用明细</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>箱位</th><th>状态</th><th>箱号</th><th>货型</th><th>占用/预留来源</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let slot of pagination.pagedRows()">
+            <td>{{ slot.slot_code }}</td>
+            <td><app-status-badge [value]="slot.slot_status" [label]="statusText(slot.slot_status)" kind="slot" /></td>
+            <td>{{ slot.container_no || "—" }}</td>
+            <td>{{ slot.cargo_type }}</td>
+            <td>
+              <ng-container *ngIf="slot.occupied_by_plan">靠泊计划 #{{ slot.occupied_by_plan }}</ng-container>
+              <ng-container *ngIf="!slot.occupied_by_plan">—</ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <button class="btn btn-small" (click)="pagination.prev()" [disabled]="pagination.page() === 1">上一页</button>
+      <span>第 {{ pagination.page() }} / {{ pagination.pageCount() }} 页（共 {{ pagination.total() }} 条）</span>
+      <button class="btn btn-small" (click)="pagination.next()" [disabled]="pagination.page() === pagination.pageCount()">下一页</button>
+    </div>
+  </section>
+</div>
